@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente - Conversor de Moneda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+        }
+        label {
+            font-size: 1rem;
+            color: #555;
+        }
+        input[type="number"] {
+            font-size: 1rem;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .container {
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            max-width: 400px;
+            width: 100%;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .exchange-rates {
+            margin-top: 20px;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left;
+        }
+        .exchange-rate {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cliente - Conversor de Moneda</h1>
+        <label for="chileanPeso">Pesos Chilenos:</label>
+        <input type="number" id="chileanPeso" step="0.01" required oninput="updateExchangeRate()"><br><br>
+
+        <button onclick="convertCurrency()">Convertir</button>
+
+        <h2>Resultado: <span id="result">0</span> Bolivianos</h2>
+        <br><br>
+        <div class="exchange-rates" id="exchangeRates"></div>
+        <br>
+        <a href="../cliente/index.html">Volver al Inicio</a>
+    </div>
+
+    <script>
+        function getExchangeRate(amount) {
+            var exchangeRates = JSON.parse(localStorage.getItem('exchangeRatesTransfer')) || [];
+            for (var i = 0; i < exchangeRates.length; i++) {
+                if (amount >= exchangeRates[i].minAmount && amount <= exchangeRates[i].maxAmount) {
+                    return exchangeRates[i].exchangeRate;
+                }
+            }
+            return null; // No se encontró una tasa de cambio para el rango de monto dado
+        }
+
+        function updateExchangeRate() {
+            var chileanPeso = parseFloat(document.getElementById("chileanPeso").value);
+            var exchangeRate = getExchangeRate(chileanPeso);
+            var exchangeRatesContainer = document.getElementById('exchangeRates');
+            exchangeRatesContainer.innerHTML = '';
+
+            if (exchangeRate && chileanPeso) {
+                exchangeRatesContainer.innerHTML = `Tasa actual: ${exchangeRate}`;
+            } else {
+                exchangeRatesContainer.innerHTML = "No se encontró una tasa de cambio válida para el monto ingresado.";
+            }
+
+            displayExchangeRates();
+        }
+
+        function convertCurrency() {
+            var chileanPeso = parseFloat(document.getElementById("chileanPeso").value);
+            var exchangeRate = getExchangeRate(chileanPeso);
+
+            if (isNaN(chileanPeso) || chileanPeso <= 0) {
+                alert("Por favor, ingresa una cantidad válida de Pesos Chilenos mayor a cero.");
+                return;
+            }
+
+            if (exchangeRate) {
+                var result = chileanPeso * exchangeRate;
+                document.getElementById("result").innerText = result.toFixed(2);
+                document.getElementById("chileanPeso").value = '';
+            } else {
+                alert("No se encontró una tasa de cambio válida para el monto ingresado.");
+            }
+        }
+
+        function displayExchangeRates() {
+            var exchangeRatesContainer = document.getElementById('exchangeRates');
+            exchangeRatesContainer.innerHTML = '';
+
+            var exchangeRates = JSON.parse(localStorage.getItem('exchangeRatesTransfer')) || [];
+
+            exchangeRates.forEach(function(rate) {
+                var exchangeRateDiv = document.createElement('div');
+                exchangeRateDiv.classList.add('exchange-rate');
+                
+                exchangeRateDiv.innerHTML = `
+                    <span>Min: ${rate.minAmount}, Max: ${rate.maxAmount}, Tasa: ${rate.exchangeRate}</span>
+                `;
+
+                exchangeRatesContainer.appendChild(exchangeRateDiv);
+            });
+        }
+
+        window.onload = function() {
+            displayExchangeRates();
+        };
+    </script>
+</body>
+</html>
