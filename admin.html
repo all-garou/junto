@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Administrador - Conversor de Moneda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #c3ec52 0%, #0ba29d 100%);
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+        }
+        label {
+            font-size: 1rem;
+            color: #555;
+        }
+        input[type="number"] {
+            font-size: 1rem;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .container {
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            max-width: 400px;
+            width: 100%;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Administrador - Conversor de Moneda</h1>
+        <label for="exchangeRateTransfer">Tasa de Cambio para Transferencias:</label>
+        <input type="number" id="exchangeRateTransfer" step="0.01" required>
+        <label for="exchangeRateDeposits">Tasa de Cambio para Depósitos:</label>
+        <input type="number" id="exchangeRateDeposits" step="0.01" required>
+        <button id="saveButton">Guardar Tasas</button>
+        <br><br>
+        <a href="index.html">Ir a inicio</a>
+        
+    </div>
+
+    <script>
+        function saveExchangeRates() {
+            var exchangeRateTransfer = document.getElementById("exchangeRateTransfer").value;
+            var exchangeRateDeposits = document.getElementById("exchangeRateDeposits").value;
+
+            // Validar si los campos no están vacíos
+            if (!exchangeRateTransfer || !exchangeRateDeposits) {
+                alert("Por favor, ingrese ambas tasas de cambio.");
+                return;
+            }
+
+            // Almacenar las tasas de cambio en el almacenamiento local
+            localStorage.setItem('exchangeRateTransfer', exchangeRateTransfer);
+            localStorage.setItem('exchangeRateDeposits', exchangeRateDeposits);
+
+            // Mostrar alerta de éxito
+            alert("¡Tasas de cambio guardadas!");
+        }
+
+        document.getElementById("saveButton").addEventListener("click", saveExchangeRates);
+
+        window.onload = function() {
+            var exchangeRateTransfer = localStorage.getItem('exchangeRateTransfer');
+            var exchangeRateDeposits = localStorage.getItem('exchangeRateDeposits');
+            if (exchangeRateTransfer) {
+                document.getElementById("exchangeRateTransfer").value = exchangeRateTransfer;
+            }
+            if (exchangeRateDeposits) {
+                document.getElementById("exchangeRateDeposits").value = exchangeRateDeposits;
+            }
+        }
+    </script>
+</body>
+</html>
