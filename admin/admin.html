@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Administrador - Conversor de Moneda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Administrador - Conversor de Moneda</h1>
+        
+        <!-- Sección de Transferencias -->
+        <h2>Transferencias</h2>
+        <label for="minAmountTransfer">Monto Mínimo:</label>
+        <input type="number" id="minAmountTransfer" step="0.01" required>
+        <label for="maxAmountTransfer">Monto Máximo:</label>
+        <input type="number" id="maxAmountTransfer" step="0.01" required>
+        <label for="exchangeRateTransfer">Tasa de Cambio:</label>
+        <input type="number" id="exchangeRateTransfer" step="0.01" required>
+        <button id="saveButtonTransfer">Guardar Tasa de Transferencia</button>
+        <div class="exchange-rates" id="exchangeRatesTransfer"></div>
+
+        <!-- Sección de Depósitos -->
+        <h2>Depósitos</h2>
+        <label for="minAmountDeposit">Monto Mínimo:</label>
+        <input type="number" id="minAmountDeposit" step="0.01" required>
+        <label for="maxAmountDeposit">Monto Máximo:</label>
+        <input type="number" id="maxAmountDeposit" step="0.01" required>
+        <label for="exchangeRateDeposit">Tasa de Cambio:</label>
+        <input type="number" id="exchangeRateDeposit" step="0.01" required>
+        <button id="saveButtonDeposit">Guardar Tasa de Depósito</button>
+        <div class="exchange-rates" id="exchangeRatesDeposit"></div>
+
+        <!-- Botón para limpiar todos los registros -->
+        <button id="clearAllButton">Limpiar Todos los Registros</button>
+
+        <br><br>
+        <a href="index.html">Ir a inicio</a>
+    </div>
+
+    <script>
+        // Funciones para Transferencias
+        function saveExchangeRateTransfer() {
+            var minAmount = parseFloat(document.getElementById("minAmountTransfer").value);
+            var maxAmount = parseFloat(document.getElementById("maxAmountTransfer").value);
+            var exchangeRate = parseFloat(document.getElementById("exchangeRateTransfer").value);
+
+            if (!minAmount || !maxAmount || !exchangeRate) {
+                alert("Por favor, complete todos los campos en Transferencias.");
+                return;
+            }
+
+            var exchangeRatesTransfer = JSON.parse(localStorage.getItem('exchangeRatesTransfer')) || [];
+
+            // Validación para que los rangos de montos no se repitan
+            var isRangeRepeated = exchangeRatesTransfer.some(function(rate) {
+                return (minAmount >= rate.minAmount && minAmount <= rate.maxAmount) ||
+                       (maxAmount >= rate.minAmount && maxAmount <= rate.maxAmount) ||
+                       (minAmount <= rate.minAmount && maxAmount >= rate.maxAmount);
+            });
+
+            if (isRangeRepeated) {
+                alert("El rango de montos ya existe en Transferencias. Por favor, elija un rango diferente.");
+                return;
+            }
+
+            exchangeRatesTransfer.push({ minAmount: minAmount, maxAmount: maxAmount, exchangeRate: exchangeRate });
+
+            localStorage.setItem('exchangeRatesTransfer', JSON.stringify(exchangeRatesTransfer));
+            alert("¡Tasa de cambio guardada en Transferencias!");
+            displayExchangeRatesTransfer();
+        }
+
+        function displayExchangeRatesTransfer() {
+            console.log("Ejecutando displayExchangeRatesTransfer");
+            var exchangeRatesContainer = document.getElementById('exchangeRatesTransfer');
+            exchangeRatesContainer.innerHTML = '';
+
+            var exchangeRatesTransfer = JSON.parse(localStorage.getItem('exchangeRatesTransfer')) || [];
+
+            exchangeRatesTransfer.forEach(function(rate, index) {
+                var exchangeRateDiv = document.createElement('div');
+                exchangeRateDiv.classList.add('exchange-rate');
+                
+                exchangeRateDiv.innerHTML = `
+                    <span>Min: ${rate.minAmount}, Max: ${rate.maxAmount}, Tasa: ${rate.exchangeRate}</span>
+                    <button onclick="deleteExchangeRateTransfer(${index})">Eliminar</button>
+                `;
+
+                exchangeRatesContainer.appendChild(exchangeRateDiv);
+            });
+        }
+
+        function deleteExchangeRateTransfer(index) {
+            var exchangeRatesTransfer = JSON.parse(localStorage.getItem('exchangeRatesTransfer')) || [];
+            exchangeRatesTransfer.splice(index, 1);
+            localStorage.setItem('exchangeRatesTransfer', JSON.stringify(exchangeRatesTransfer));
+            displayExchangeRatesTransfer();
+        }
+
+        document.getElementById("saveButtonTransfer").addEventListener("click", saveExchangeRateTransfer);
+
+        // Funciones para Depósitos
+        function saveExchangeRateDeposit() {
+            var minAmount = parseFloat(document.getElementById("minAmountDeposit").value);
+            var maxAmount = parseFloat(document.getElementById("maxAmountDeposit").value);
+            var exchangeRate = parseFloat(document.getElementById("exchangeRateDeposit").value);
+
+            if (!minAmount || !maxAmount || !exchangeRate) {
+                alert("Por favor, complete todos los campos en Depósitos.");
+                return;
+            }
+
+            var exchangeRatesDeposit = JSON.parse(localStorage.getItem('exchangeRatesDeposit')) || [];
+
+            // Validación para que los rangos de montos no se repitan
+            var isRangeRepeated = exchangeRatesDeposit.some(function(rate) {
+                return (minAmount >= rate.minAmount && minAmount <= rate.maxAmount) ||
+                       (maxAmount >= rate.minAmount && maxAmount <= rate.maxAmount) ||
+                       (minAmount <= rate.minAmount && maxAmount >= rate.maxAmount);
+            });
+
+            if (isRangeRepeated) {
+                alert("El rango de montos ya existe en Depósitos. Por favor, elija un rango diferente.");
+                return;
+            }
+
+            exchangeRatesDeposit.push({ minAmount: minAmount, maxAmount: maxAmount, exchangeRate: exchangeRate });
+
+            localStorage.setItem('exchangeRatesDeposit', JSON.stringify(exchangeRatesDeposit));
+            alert("¡Tasa de cambio guardada en Depósitos!");
+            displayExchangeRatesDeposit();
+        }
+
+        function displayExchangeRatesDeposit() {
+            var exchangeRatesContainer = document.getElementById('exchangeRatesDeposit');
+            exchangeRatesContainer.innerHTML = '';
+
+            var exchangeRatesDeposit = JSON.parse(localStorage.getItem('exchangeRatesDeposit')) || [];
+
+            exchangeRatesDeposit.forEach(function(rate, index) {
+                var exchangeRateDiv = document.createElement('div');
+                exchangeRateDiv.classList.add('exchange-rate');
+                
+                exchangeRateDiv.innerHTML = `
+                    <span>Min: ${rate.minAmount}, Max: ${rate.maxAmount}, Tasa: ${rate.exchangeRate}</span>
+                    <button onclick="deleteExchangeRateDeposit(${index})">Eliminar</button>
+                `;
+
+                exchangeRatesContainer.appendChild(exchangeRateDiv);
+            });
+        }
+
+        function deleteExchangeRateDeposit(index) {
+            var exchangeRatesDeposit = JSON.parse(localStorage.getItem('exchangeRatesDeposit')) || [];
+            exchangeRatesDeposit.splice(index, 1);
+            localStorage.setItem('exchangeRatesDeposit', JSON.stringify(exchangeRatesDeposit));
+            displayExchangeRatesDeposit();
+        }
+
+        document.getElementById("saveButtonDeposit").addEventListener("click", saveExchangeRateDeposit);
+
+        // Función para limpiar todos los registros
+        function clearAllRecords() {
+            localStorage.removeItem('exchangeRatesTransfer');
+            localStorage.removeItem('exchangeRatesDeposit');
+            localStorage.removeItem('exchangeRates'); // Para asegurar que también se limpien en la página del cliente
+            alert("¡Todos los registros han sido limpiados!");
+
+            // Refrescar las listas de tasas de cambio
+            displayExchangeRatesTransfer();
+            displayExchangeRatesDeposit();
+        }
+
+        document.getElementById("clearAllButton").addEventListener("click", clearAllRecords);
+
+        window.onload = function() {
+            displayExchangeRatesTransfer();
+            displayExchangeRatesDeposit();
+        };
+    </script>
+</body>
+</html>
